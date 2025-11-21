@@ -11,30 +11,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # --- Get source code ---
+
+      # Checkout repository
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # --- .NET SDK ---
+      # Install .NET
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: "8.0.x"
 
-      # --- Sonar scanner global tool ---
-      - name: Install dotnet-sonarscanner
+      # Install SonarCloud scanner
+      - name: Install Sonar Scanner
         run: dotnet tool install --global dotnet-sonarscanner
 
       - name: Add dotnet tools to PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      # --- Restore packages ---
+      # Restore dependencies
       - name: Restore dependencies
         run: dotnet restore
 
-      # --- SonarCloud: begin analysis ---
+      # Start SonarCloud analysis
       - name: SonarCloud - Begin analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -46,14 +47,14 @@ jobs:
             /o:"$SONAR_ORG" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="$SONAR_TOKEN" \
-            /d:sonar.cs.cobertura.reportsPaths="TestOutput/coverage/coverage.cobertura.xml"
+            /d:sonar.cs.opencover.reportsPaths="TestOutput/coverage/coverage.cobertura.xml"
 
-      # --- Build ---
+      # Build
       - name: Build solution
         run: dotnet build --configuration Release --no-restore
 
-      # --- Tests (unit + BDD) + coverage in ONE run ---
-      - name: Run Unit + BDD Tests with coverage
+      # Run tests (Unit + BDD) with coverage
+      - name: Run Tests with Coverage
         run: |
           mkdir -p TestOutput/TestResults
           mkdir -p TestOutput/coverage
@@ -64,24 +65,34 @@ jobs:
             /p:CoverletOutput=TestOutput/coverage/ \
             /p:CoverletOutputFormat=cobertura
 
-      # --- Security: vulnerable dependencies ---
-      - name: Security - Check vulnerable dependencies
+      # SECURITY – dependency vulnerability check
+      - name: Security Scan - Vulnerable Dependencies
         run: dotnet list package --vulnerable --include-transitive
 
-      # --- SonarCloud: end analysis (uploads report) ---
+      # 👉 Publish test results to GitHub UI (Commit + PR)
+      - name: Publish Test Results to GitHub
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: .NET Tests
+          path: TestOutput/TestResults/*.trx
+          reporter: dotnet-trx
+          fail-on-error: false
+
+      # Finish SonarCloud analysis
       - name: SonarCloud - End analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
-      # --- Artifacts: TRX test report ---
+      # Upload artifacts: Test results
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: TestOutput/TestResults/
 
-      # --- Artifacts: coverage report (Cobertura) ---
+      # Upload artifacts: Coverage
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
