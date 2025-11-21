@@ -1,4 +1,4 @@
-name: CI - Build, Tests, Coverage, SonarCloud
+name: CI - Build, Tests, Coverage, SonarCloud, Security
 
 on:
   push:
@@ -11,31 +11,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
-      # Checkout repository
+      # -----------------------------
+      # Checkout
+      # -----------------------------
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # Install .NET
+      # -----------------------------
+      # Setup .NET SDK
+      # -----------------------------
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: "8.0.x"
+          dotnet-version: '8.0.x'
 
-      # Install SonarCloud scanner
-      - name: Install Sonar Scanner
+      # -----------------------------
+      # Install Sonar Scanner
+      # -----------------------------
+      - name: Install dotnet-sonarscanner
         run: dotnet tool install --global dotnet-sonarscanner
 
       - name: Add dotnet tools to PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      # Restore dependencies
+      # -----------------------------
+      # Restore Dependencies
+      # -----------------------------
       - name: Restore dependencies
         run: dotnet restore
 
-      # Start SonarCloud analysis
+      # -----------------------------
+      # Begin SonarCloud Analysis
+      # -----------------------------
       - name: SonarCloud - Begin analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -49,52 +58,63 @@ jobs:
             /d:sonar.token="$SONAR_TOKEN" \
             /d:sonar.cs.opencover.reportsPaths="TestOutput/coverage/coverage.cobertura.xml"
 
+      # -----------------------------
       # Build
+      # -----------------------------
       - name: Build solution
         run: dotnet build --configuration Release --no-restore
 
-      # Run tests (Unit + BDD) with coverage
-      - name: Run Tests with Coverage
+      # -----------------------------
+      # Run Unit + BDD Tests + Coverage
+      # -----------------------------
+      - name: Run Tests (Unit + BDD + Coverage)
         run: |
           mkdir -p TestOutput/TestResults
           mkdir -p TestOutput/coverage
+
           dotnet test --no-build --configuration Release \
             --logger "trx;LogFileName=test_results.trx" \
             --results-directory "TestOutput/TestResults" \
             /p:CollectCoverage=true \
-            /p:CoverletOutput=TestOutput/coverage/ \
+            /p:CoverletOutput=TestOutput/coverage/coverage.cobertura.xml \
             /p:CoverletOutputFormat=cobertura
 
-      # SECURITY – dependency vulnerability check
-      - name: Security Scan - Vulnerable Dependencies
+      # -----------------------------
+      # Security Scan
+      # -----------------------------
+      - name: Dependency Vulnerability Scan
         run: dotnet list package --vulnerable --include-transitive
 
-      # 👉 Publish test results to GitHub UI (Commit + PR)
-      - name: Publish Test Results to GitHub
+      # -----------------------------
+      # GitHub Checks Test Report
+      # -----------------------------
+      - name: Publish Test Summary
         uses: dorny/test-reporter@v1
-        if: always()
         with:
           name: .NET Tests
           path: TestOutput/TestResults/*.trx
           reporter: dotnet-trx
-          fail-on-error: false
+          fail-on-empty: true
 
-      # Finish SonarCloud analysis
+      # -----------------------------
+      # End SonarCloud Analysis
+      # -----------------------------
       - name: SonarCloud - End analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
-      # Upload artifacts: Test results
+      # -----------------------------
+      # Upload Artifacts
+      # -----------------------------
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: TestOutput/TestResults/
 
-      # Upload artifacts: Coverage
       - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: TestOutput/coverage/
+          path: TestOutput/coverage/coverage.cobertura.xml
