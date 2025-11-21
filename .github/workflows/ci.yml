@@ -1,52 +1,43 @@
-name: CI - Build, Unit + BDD Tests, SonarCloud
+name: CI - Build, Tests, Coverage, SonarCloud
 
 on:
   pull_request:
-    branches:
-      - master
+    branches: [ master ]
   push:
-    branches:
-      - master
+    branches: [ master ]
 
 jobs:
   build-test-sonar:
     runs-on: ubuntu-latest
 
     steps:
-      # -----------------------------
-      # Checkout
-      # -----------------------------
+
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # required for proper blame/coverage in SonarCloud
+          fetch-depth: 0
 
-      # -----------------------------
-      # .NET SDK
-      # -----------------------------
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      # -----------------------------
-      # SonarCloud scanner
-      # -----------------------------
+      # Install SonarCloud tool
       - name: Install dotnet-sonarscanner
         run: dotnet tool install --global dotnet-sonarscanner
 
-      - name: Add dotnet tools to PATH
+      - name: Add dotnet tool PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      # -----------------------------
-      # Restore
-      # -----------------------------
+      # Install coverage report generator
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      # Restore Dependencies
       - name: Restore dependencies
         run: dotnet restore
 
-      # -----------------------------
-      # SonarCloud BEGIN
-      # -----------------------------
+      # SonarCloud Begin
       - name: SonarCloud - Begin analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -58,45 +49,52 @@ jobs:
             /o:"$SONAR_ORG" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="$SONAR_TOKEN" \
-            /d:sonar.cs.opencover.reportsPaths="**/coverage.cobertura.xml"
+            /d:sonar.cs.opencover.reportsPaths="TestOutput/Coverage/Cobertura.xml"
 
-      # -----------------------------
       # Build
-      # -----------------------------
       - name: Build solution
         run: dotnet build --configuration Release --no-restore
 
-      # -----------------------------
-      # Unit + BDD tests (TRX report)
-      # -----------------------------
-      - name: Run Unit & BDD Tests (TRX)
-        run: dotnet test --no-build --configuration Release --logger "trx;LogFileName=test_results.trx"
+      # Run Tests (TRX)
+      - name: Run Unit + BDD Tests (TRX)
+        run: |
+          mkdir -p TestOutput/TestResults
+          dotnet test --no-build --configuration Release \
+            --logger "trx;LogFileName=test_results.trx" \
+            --results-directory "TestOutput/TestResults"
 
-      # -----------------------------
-      # Coverage run (for SonarCloud)
-      # -----------------------------
+      # Run Tests with Coverage
       - name: Run Tests with Coverage
-        run: dotnet test --no-build --configuration Release --collect:"XPlat Code Coverage"
+        run: |
+          mkdir -p TestOutput/Coverage
+          dotnet test --no-build --configuration Release \
+            --collect:"XPlat Code Coverage" \
+            --results-directory "TestOutput/coverage-temp"
 
-      # -----------------------------
-      # SonarCloud END
-      # -----------------------------
+      # Convert coverage to Cobertura
+      - name: Convert Coverage
+        run: |
+          reportgenerator \
+            -reports:TestOutput/coverage-temp/**/coverage.cobertura.xml \
+            -targetdir:TestOutput/Coverage \
+            -reporttypes:Cobertura
+
+      # SonarCloud End
       - name: SonarCloud - End analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
-      # -----------------------------
-      # Upload test + coverage artifacts
-      # -----------------------------
-      - name: Upload Test Results (Unit + BDD)
+      # Upload test results
+      - name: Upload Test Results
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: "**/*.trx"
+          path: TestOutput/TestResults/
 
-      - name: Upload Coverage Report
+      # Upload coverage
+      - name: Upload Coverage Output
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-cobertura
-          path: "**/coverage.cobertura.xml"
+          name: coverage-report
+          path: TestOutput/Coverage/
