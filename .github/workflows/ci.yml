@@ -1,9 +1,9 @@
-name: CI - Build, Tests, Coverage, SonarCloud
+name: CI - Build, Tests, Coverage & SonarCloud
 
 on:
-  push:
-    branches: [ master ]
   pull_request:
+    branches: [ master ]
+  push:
     branches: [ master ]
 
 jobs:
@@ -12,29 +12,41 @@ jobs:
 
     steps:
 
+      # -----------------------------
+      # CHECKOUT
+      # -----------------------------
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          fetch-depth: 0   # Required for SonarCloud blame/PR
 
-      - name: Setup .NET 8 SDK
+      # -----------------------------
+      # SETUP .NET
+      # -----------------------------
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: "8.0.x"
 
-      - name: Install ReportGenerator
-        run: dotnet tool install --global dotnet-reportgenerator-globaltool
-
-      - name: Install SonarScanner
+      # -----------------------------
+      # INSTALL sonar scanner
+      # -----------------------------
+      - name: Install dotnet-sonarscanner
         run: dotnet tool install --global dotnet-sonarscanner
 
-      - name: Add dotnet tools to PATH
+      - name: Add Tools to PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
+      # -----------------------------
+      # RESTORE
+      # -----------------------------
       - name: Restore dependencies
         run: dotnet restore
 
-      - name: SonarCloud - Begin
+      # -----------------------------
+      # BEGIN SONARCLOUD
+      # -----------------------------
+      - name: SonarCloud - Begin analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
@@ -45,47 +57,60 @@ jobs:
             /o:"$SONAR_ORG" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="$SONAR_TOKEN" \
-            /d:sonar.cs.opencover.reportsPaths="TestOutput/Coverage/coverage.opencover.xml"
+            /d:sonar.cs.opencover.reportsPaths="TestOutput/Coverage/coverage.cobertura.xml"
 
+      # -----------------------------
+      # BUILD
+      # -----------------------------
       - name: Build solution
         run: dotnet build --configuration Release --no-restore
 
-      - name: Run Tests (TRX)
+      # -----------------------------
+      # UNIT + BDD TESTS (TRX)
+      # -----------------------------
+      - name: Run Unit & BDD Tests
         run: |
           mkdir -p TestOutput/TestResults
           dotnet test --no-build --configuration Release \
             --logger "trx;LogFileName=test_results.trx" \
             --results-directory "TestOutput/TestResults"
 
-      - name: Run Tests with XPlat Code Coverage
+      # -----------------------------
+      # COVERAGE COLLECTION (XPlat)
+      # -----------------------------
+      - name: Run Tests with Coverage
         run: |
           mkdir -p TestOutput/CoverageRaw
           dotnet test --no-build --configuration Release \
             --collect:"XPlat Code Coverage" \
             --results-directory TestOutput/CoverageRaw
 
-      - name: Convert coverage to OpenCover format
+      # -----------------------------
+      # COPY RAW COVERAGE TO FINAL LOCATION
+      # -----------------------------
+      - name: Copy coverage file
         run: |
           mkdir -p TestOutput/Coverage
-          reportgenerator \
-            -reports:TestOutput/CoverageRaw/**/coverage.cobertura.xml \
-            -targetdir:TestOutput/Coverage \
-            -reporttypes:OpenCover
+          cp TestOutput/CoverageRaw/**/coverage.cobertura.xml TestOutput/Coverage/coverage.cobertura.xml
 
-          mv TestOutput/Coverage/opencover.xml TestOutput/Coverage/coverage.opencover.xml
-
-      - name: SonarCloud - End
+      # -----------------------------
+      # END SONARCLOUD
+      # -----------------------------
+      - name: SonarCloud - End analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
+      # -----------------------------
+      # ARTIFACT UPLOADS
+      # -----------------------------
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: TestOutput/TestResults/
 
-      - name: Upload Coverage Output
+      - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
