@@ -1,12 +1,9 @@
-name: CI - Build, Test, Coverage, SonarCloud
-
-permissions:
-  contents: write
+name: CI - Build, Tests, Coverage, SonarCloud
 
 on:
-  pull_request:
-    branches: [ master ]
   push:
+    branches: [ master ]
+  pull_request:
     branches: [ master ]
 
 jobs:
@@ -15,33 +12,41 @@ jobs:
 
     steps:
 
+      # -----------------------------
       # Checkout
+      # -----------------------------
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # -----------------------------
       # Setup .NET
+      # -----------------------------
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: 8.0.x
 
       # Install tools
-      - name: Install ReportGenerator
-        run: dotnet tool install --global dotnet-reportgenerator-globaltool
-
-      - name: Install SonarScanner
+      - name: Install dotnet-sonarscanner
         run: dotnet tool install --global dotnet-sonarscanner
 
-      - name: Add .NET tools to PATH
+      - name: Install reportgenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Add tools to PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      # Restore
+      # -----------------------------
+      # Restore packages
+      # -----------------------------
       - name: Restore dependencies
         run: dotnet restore
 
-      # Sonar Begin
+      # -----------------------------
+      # Begin SonarCloud Analysis
+      # -----------------------------
       - name: SonarCloud Begin
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -50,13 +55,18 @@ jobs:
             /k:"${{ secrets.SONAR_PROJECT_KEY }}" \
             /o:"${{ secrets.SONAR_ORG }}" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.cs.opencover.reportsPaths="TestReports/coverage.cobertura.xml"
 
+      # -----------------------------
       # Build
-      - name: Build
+      # -----------------------------
+      - name: Build solution
         run: dotnet build --configuration Release --no-restore
 
-      # Run Unit + BDD Tests
+      # -----------------------------
+      # Run Unit + BDD Tests (TRX)
+      # -----------------------------
       - name: Run Tests (TRX)
         run: |
           mkdir -p TestReports
@@ -64,23 +74,31 @@ jobs:
             --logger "trx;LogFileName=test_results.trx" \
             --results-directory TestReports
 
-      # Collect Coverage
-      - name: Collect Coverage
+      # -----------------------------
+      # Run Tests with Coverage
+      # -----------------------------
+      - name: Run Tests With Coverage
         run: |
           mkdir -p TestReports
           dotnet test --no-build --configuration Release \
             --collect:"XPlat Code Coverage" \
             --results-directory coverage-temp
+
+          # Copy coverage report
           cp coverage-temp/**/coverage.cobertura.xml TestReports/coverage.cobertura.xml
 
-      # Sonar End
+      # -----------------------------
+      # End Sonar Analysis
+      # -----------------------------
       - name: SonarCloud End
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
-      # Commit Test Results to repo
-      - name: Commit Test Reports to Repo
+      # -----------------------------
+      # Commit test + coverage results to repo
+      # -----------------------------
+      - name: Commit Test Reports
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "github-actions"
@@ -88,8 +106,10 @@ jobs:
           git commit -m "Add test + coverage reports [skip ci]" || echo "No changes"
           git push
 
-      # Upload artifacts
-      - name: Upload Test Reports
+      # -----------------------------
+      # Upload Test + Coverage Artifacts
+      # -----------------------------
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: test-and-coverage-reports
