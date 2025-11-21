@@ -1,16 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<TestRun id="22f634f3-6b15-423f-87a1-82ee3fc9d661" name="@runnervmg1sw1 2025-11-21 12:28:32" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
-  <Times creation="2025-11-21T12:28:32.7508706+00:00" queuing="2025-11-21T12:28:32.7508706+00:00" start="2025-11-21T12:28:28.5053073+00:00" finish="2025-11-21T12:28:32.7881867+00:00" />
-  <TestSettings name="default" id="696e72f7-6ecd-44c0-8fe3-1692a629768b">
-    <Deployment runDeploymentRoot="_runnervmg1sw1_2025-11-21_12_28_32" />
+<TestRun id="4f8393c2-85cf-47ea-94f8-952b621c6200" name="@runnervmg1sw1 2025-11-21 12:41:53" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2025-11-21T12:41:53.1090386+00:00" queuing="2025-11-21T12:41:53.1090387+00:00" start="2025-11-21T12:41:50.2095872+00:00" finish="2025-11-21T12:41:53.1453173+00:00" />
+  <TestSettings name="default" id="cbd4ad10-f7e5-44e0-a90f-6fb2f3e9b8d3">
+    <Deployment runDeploymentRoot="_runnervmg1sw1_2025-11-21_12_41_53" />
   </TestSettings>
   <Results>
-    <UnitTestResult executionId="b92c7c58-ff64-48cc-a772-2893fd8d79af" testId="1811c636-61a8-d39f-981e-b740a3f3f974" testName="BPCalculator.Tests.BloodPressureTests.Calculates_Correct_Category(sys: 85, dia: 55, expected: Low)" computerName="runnervmg1sw1" duration="00:00:00.0060365" startTime="2025-11-21T12:28:32.3699402+00:00" endTime="2025-11-21T12:28:32.3699764+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="b92c7c58-ff64-48cc-a772-2893fd8d79af" />
-    <UnitTestResult executionId="819254bb-8f59-46c7-b332-a71f8d03eba7" testId="aa6fe99d-2d83-9358-3cfe-2424fd3408d1" testName="BPCalculator.Tests.BloodPressureTests.Throws_When_Systolic_Below_Min" computerName="runnervmg1sw1" duration="00:00:00.0002373" startTime="2025-11-21T12:28:32.3755353+00:00" endTime="2025-11-21T12:28:32.3755354+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="819254bb-8f59-46c7-b332-a71f8d03eba7" />
-    <UnitTestResult executionId="5eed5b96-4189-4ad6-ac66-1aa9507ebdea" testId="96e0c744-cc4e-7062-638e-7182710e370f" testName="BPCalculator.Tests.BloodPressureTests.Calculates_Correct_Category(sys: 130, dia: 85, expected: PreHigh)" computerName="runnervmg1sw1" duration="00:00:00.0000281" startTime="2025-11-21T12:28:32.3754056+00:00" endTime="2025-11-21T12:28:32.3754056+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="5eed5b96-4189-4ad6-ac66-1aa9507ebdea" />
-    <UnitTestResult executionId="8dddaaa3-3782-4108-8cd9-3a74301de87b" testId="57440803-4d0b-c38d-550d-a33258b52a43" testName="BPCalculator.Tests.BloodPressureTests.Calculates_Correct_Category(sys: 150, dia: 95, expected: High)" computerName="runnervmg1sw1" duration="00:00:00.0003359" startTime="2025-11-21T12:28:32.3750579+00:00" endTime="2025-11-21T12:28:32.3750579+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="8dddaaa3-3782-4108-8cd9-3a74301de87b" />
-    <UnitTestResult executionId="87b026bf-3d19-4339-997a-bd21157f1718" testId="43aeb687-ef0f-f19d-c1dc-d20631e014b9" testName="BPCalculator.Tests.BloodPressureTests.Calculates_Correct_Category(sys: 110, dia: 70, expected: Ideal)" computerName="runnervmg1sw1" duration="00:00:00.0000095" startTime="2025-11-21T12:28:32.3753668+00:00" endTime="2025-11-21T12:28:32.3753668+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="87b026bf-3d19-4339-997a-bd21157f1718" />
-    <UnitTestResult executionId="d12866c5-c2ce-44a3-9900-e6d91dcc6157" testId="ba31608e-56ff-846e-926b-91a08278eb80" testName="Ideal blood pressure" computerName="runnervmg1sw1" duration="00:00:00.0008240" startTime="2025-11-21T12:28:32.5249666+00:00" endTime="2025-11-21T12:28:32.5249667+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="d12866c5-c2ce-44a3-9900-e6d91dcc6157">
+    <UnitTestResult executionId="47161566-ca6f-40b1-9f0f-382eb539a09d" testId="ba31608e-56ff-846e-926b-91a08278eb80" testName="Ideal blood pressure" computerName="runnervmg1sw1" duration="00:00:00.0005798" startTime="2025-11-21T12:41:52.9539055+00:00" endTime="2025-11-21T12:41:52.9539055+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="47161566-ca6f-40b1-9f0f-382eb539a09d">
       <Output>
         <StdOut>Given the systolic value is 110
 -&gt; done: BPSteps.GivenTheSystolicValueIs(110) (0.0s)
@@ -22,19 +17,8 @@ Then the result should be "Ideal Blood Pressure"
 -&gt; done: BPSteps.ThenTheResultShouldBe("Ideal Blood Pressure") (0.0s)</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="417f8370-f6f1-4182-afc2-37ade5d18b5a" testId="c2eda864-101c-ae68-2f5e-4e1e7c5be3c9" testName="Invalid blood pressure (diastolic &gt;= systolic)" computerName="runnervmg1sw1" duration="00:00:00.0009514" startTime="2025-11-21T12:28:32.4686467+00:00" endTime="2025-11-21T12:28:32.4686468+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="417f8370-f6f1-4182-afc2-37ade5d18b5a">
-      <Output>
-        <StdOut>Given the systolic value is 100
--&gt; done: BPSteps.GivenTheSystolicValueIs(100) (0.0s)
-And the diastolic value is 120
--&gt; done: BPSteps.GivenTheDiastolicValueIs(120) (0.0s)
-When I calculate the blood pressure category
--&gt; done: BPSteps.WhenICalculateTheBloodPressureCategory() (0.0s)
-Then an error should be thrown
--&gt; done: BPSteps.ThenAnErrorShouldBeThrown() (0.0s)</StdOut>
-      </Output>
-    </UnitTestResult>
-    <UnitTestResult executionId="62dce97e-578b-49af-a04e-dfb31137ecc3" testId="92b1d2e5-1a26-0fe2-2974-c2b6803af135" testName="Low blood pressure" computerName="runnervmg1sw1" duration="00:00:00.0016180" startTime="2025-11-21T12:28:32.4676182+00:00" endTime="2025-11-21T12:28:32.4676183+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="62dce97e-578b-49af-a04e-dfb31137ecc3">
+    <UnitTestResult executionId="2f15c5ae-69e6-45fd-882e-f57ee75f8779" testId="43aeb687-ef0f-f19d-c1dc-d20631e014b9" testName="BPCalculator.Tests.BloodPressureTests.Calculates_Correct_Category(sys: 110, dia: 70, expected: Ideal)" computerName="runnervmg1sw1" duration="00:00:00.0000083" startTime="2025-11-21T12:41:52.7876268+00:00" endTime="2025-11-21T12:41:52.7876269+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="2f15c5ae-69e6-45fd-882e-f57ee75f8779" />
+    <UnitTestResult executionId="0cf41916-16de-4727-b066-a740de83a22c" testId="92b1d2e5-1a26-0fe2-2974-c2b6803af135" testName="Low blood pressure" computerName="runnervmg1sw1" duration="00:00:00.0013599" startTime="2025-11-21T12:41:52.9093776+00:00" endTime="2025-11-21T12:41:52.9093778+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="0cf41916-16de-4727-b066-a740de83a22c">
       <Output>
         <StdOut>Given the systolic value is 85
 -&gt; done: BPSteps.GivenTheSystolicValueIs(85) (0.0s)
@@ -46,8 +30,24 @@ Then the result should be "Low Blood Pressure"
 -&gt; done: BPSteps.ThenTheResultShouldBe("Low Blood Pressure") (0.0s)</StdOut>
       </Output>
     </UnitTestResult>
-    <UnitTestResult executionId="e8ce43f6-48e5-4b15-9530-e8cd8554cfbf" testId="e9dec6f9-cc93-6cf8-3762-8c1b3bc12d3a" testName="BPCalculator.Tests.BloodPressureTests.Throws_When_Diastolic_GTE_Systolic" computerName="runnervmg1sw1" duration="00:00:00.0007557" startTime="2025-11-21T12:28:32.3754780+00:00" endTime="2025-11-21T12:28:32.3754780+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="e8ce43f6-48e5-4b15-9530-e8cd8554cfbf" />
-    <UnitTestResult executionId="fa34b86e-4a25-4aea-b33c-d9f5985b1893" testId="6d52c65f-ec94-923a-d5a7-07f035e64d28" testName="High blood pressure" computerName="runnervmg1sw1" duration="00:00:00.1048980" startTime="2025-11-21T12:28:32.4658738+00:00" endTime="2025-11-21T12:28:32.4658739+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="fa34b86e-4a25-4aea-b33c-d9f5985b1893">
+    <UnitTestResult executionId="a9739b46-a14f-428d-9c51-365447367313" testId="96e0c744-cc4e-7062-638e-7182710e370f" testName="BPCalculator.Tests.BloodPressureTests.Calculates_Correct_Category(sys: 130, dia: 85, expected: PreHigh)" computerName="runnervmg1sw1" duration="00:00:00.0000054" startTime="2025-11-21T12:41:52.7876648+00:00" endTime="2025-11-21T12:41:52.7876648+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="a9739b46-a14f-428d-9c51-365447367313" />
+    <UnitTestResult executionId="420ad953-e4b9-404c-b144-93411715ee6f" testId="57440803-4d0b-c38d-550d-a33258b52a43" testName="BPCalculator.Tests.BloodPressureTests.Calculates_Correct_Category(sys: 150, dia: 95, expected: High)" computerName="runnervmg1sw1" duration="00:00:00.0003513" startTime="2025-11-21T12:41:52.7873494+00:00" endTime="2025-11-21T12:41:52.7873495+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="420ad953-e4b9-404c-b144-93411715ee6f" />
+    <UnitTestResult executionId="f2426812-f864-4351-8300-28eb32fb0b2a" testId="c2eda864-101c-ae68-2f5e-4e1e7c5be3c9" testName="Invalid blood pressure (diastolic &gt;= systolic)" computerName="runnervmg1sw1" duration="00:00:00.0007618" startTime="2025-11-21T12:41:52.9101931+00:00" endTime="2025-11-21T12:41:52.9101932+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f2426812-f864-4351-8300-28eb32fb0b2a">
+      <Output>
+        <StdOut>Given the systolic value is 100
+-&gt; done: BPSteps.GivenTheSystolicValueIs(100) (0.0s)
+And the diastolic value is 120
+-&gt; done: BPSteps.GivenTheDiastolicValueIs(120) (0.0s)
+When I calculate the blood pressure category
+-&gt; done: BPSteps.WhenICalculateTheBloodPressureCategory() (0.0s)
+Then an error should be thrown
+-&gt; done: BPSteps.ThenAnErrorShouldBeThrown() (0.0s)</StdOut>
+      </Output>
+    </UnitTestResult>
+    <UnitTestResult executionId="9324675c-d00d-458a-b8d5-394c13a7b389" testId="aa6fe99d-2d83-9358-3cfe-2424fd3408d1" testName="BPCalculator.Tests.BloodPressureTests.Throws_When_Systolic_Below_Min" computerName="runnervmg1sw1" duration="00:00:00.0002176" startTime="2025-11-21T12:41:52.7877685+00:00" endTime="2025-11-21T12:41:52.7877685+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="9324675c-d00d-458a-b8d5-394c13a7b389" />
+    <UnitTestResult executionId="182888c4-332f-43de-834d-6e32f92ed0f6" testId="e9dec6f9-cc93-6cf8-3762-8c1b3bc12d3a" testName="BPCalculator.Tests.BloodPressureTests.Throws_When_Diastolic_GTE_Systolic" computerName="runnervmg1sw1" duration="00:00:00.0006264" startTime="2025-11-21T12:41:52.7877204+00:00" endTime="2025-11-21T12:41:52.7877204+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="182888c4-332f-43de-834d-6e32f92ed0f6" />
+    <UnitTestResult executionId="176933fe-11fc-4592-94f9-db75b03579c7" testId="1811c636-61a8-d39f-981e-b740a3f3f974" testName="BPCalculator.Tests.BloodPressureTests.Calculates_Correct_Category(sys: 85, dia: 55, expected: Low)" computerName="runnervmg1sw1" duration="00:00:00.0078936" startTime="2025-11-21T12:41:52.7833810+00:00" endTime="2025-11-21T12:41:52.7833979+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="176933fe-11fc-4592-94f9-db75b03579c7" />
+    <UnitTestResult executionId="6f3121a3-b5f9-4d73-8600-06b9453b1c3e" testId="6d52c65f-ec94-923a-d5a7-07f035e64d28" testName="High blood pressure" computerName="runnervmg1sw1" duration="00:00:00.1363663" startTime="2025-11-21T12:41:52.9079215+00:00" endTime="2025-11-21T12:41:52.9079217+00:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="6f3121a3-b5f9-4d73-8600-06b9453b1c3e">
       <Output>
         <StdOut>Given the systolic value is 150
 -&gt; done: BPSteps.GivenTheSystolicValueIs(150) (0.0s)
@@ -62,57 +62,57 @@ Then the result should be "High Blood Pressure"
   </Results>
   <TestDefinitions>
     <UnitTest name="BPCalculator.Tests.BloodPressureTests.Calculates_Correct_Category(sys: 150, dia: 95, expected: High)" storage="/home/runner/work/bp/bp/bpcalculator.tests/bin/release/net9.0/bpcalculator.tests.dll" id="57440803-4d0b-c38d-550d-a33258b52a43">
-      <Execution id="8dddaaa3-3782-4108-8cd9-3a74301de87b" />
+      <Execution id="420ad953-e4b9-404c-b144-93411715ee6f" />
       <TestMethod codeBase="/home/runner/work/bp/bp/BPCalculator.Tests/bin/Release/net9.0/BPCalculator.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="BPCalculator.Tests.BloodPressureTests" name="Calculates_Correct_Category" />
     </UnitTest>
     <UnitTest name="BPCalculator.Tests.BloodPressureTests.Calculates_Correct_Category(sys: 85, dia: 55, expected: Low)" storage="/home/runner/work/bp/bp/bpcalculator.tests/bin/release/net9.0/bpcalculator.tests.dll" id="1811c636-61a8-d39f-981e-b740a3f3f974">
-      <Execution id="b92c7c58-ff64-48cc-a772-2893fd8d79af" />
+      <Execution id="176933fe-11fc-4592-94f9-db75b03579c7" />
       <TestMethod codeBase="/home/runner/work/bp/bp/BPCalculator.Tests/bin/Release/net9.0/BPCalculator.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="BPCalculator.Tests.BloodPressureTests" name="Calculates_Correct_Category" />
     </UnitTest>
     <UnitTest name="Invalid blood pressure (diastolic &gt;= systolic)" storage="/home/runner/work/bp/bp/bpcalculator.tests/bin/release/net9.0/bpcalculator.tests.dll" id="c2eda864-101c-ae68-2f5e-4e1e7c5be3c9">
-      <Execution id="417f8370-f6f1-4182-afc2-37ade5d18b5a" />
+      <Execution id="f2426812-f864-4351-8300-28eb32fb0b2a" />
       <TestMethod codeBase="/home/runner/work/bp/bp/BPCalculator.Tests/bin/Release/net9.0/BPCalculator.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="BPCalculator.Tests.Features.BloodPressureCategoryClassificationFeature" name="InvalidBloodPressureDiastolicSystolic" />
     </UnitTest>
     <UnitTest name="BPCalculator.Tests.BloodPressureTests.Calculates_Correct_Category(sys: 110, dia: 70, expected: Ideal)" storage="/home/runner/work/bp/bp/bpcalculator.tests/bin/release/net9.0/bpcalculator.tests.dll" id="43aeb687-ef0f-f19d-c1dc-d20631e014b9">
-      <Execution id="87b026bf-3d19-4339-997a-bd21157f1718" />
+      <Execution id="2f15c5ae-69e6-45fd-882e-f57ee75f8779" />
       <TestMethod codeBase="/home/runner/work/bp/bp/BPCalculator.Tests/bin/Release/net9.0/BPCalculator.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="BPCalculator.Tests.BloodPressureTests" name="Calculates_Correct_Category" />
     </UnitTest>
     <UnitTest name="BPCalculator.Tests.BloodPressureTests.Throws_When_Diastolic_GTE_Systolic" storage="/home/runner/work/bp/bp/bpcalculator.tests/bin/release/net9.0/bpcalculator.tests.dll" id="e9dec6f9-cc93-6cf8-3762-8c1b3bc12d3a">
-      <Execution id="e8ce43f6-48e5-4b15-9530-e8cd8554cfbf" />
+      <Execution id="182888c4-332f-43de-834d-6e32f92ed0f6" />
       <TestMethod codeBase="/home/runner/work/bp/bp/BPCalculator.Tests/bin/Release/net9.0/BPCalculator.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="BPCalculator.Tests.BloodPressureTests" name="Throws_When_Diastolic_GTE_Systolic" />
     </UnitTest>
     <UnitTest name="High blood pressure" storage="/home/runner/work/bp/bp/bpcalculator.tests/bin/release/net9.0/bpcalculator.tests.dll" id="6d52c65f-ec94-923a-d5a7-07f035e64d28">
-      <Execution id="fa34b86e-4a25-4aea-b33c-d9f5985b1893" />
+      <Execution id="6f3121a3-b5f9-4d73-8600-06b9453b1c3e" />
       <TestMethod codeBase="/home/runner/work/bp/bp/BPCalculator.Tests/bin/Release/net9.0/BPCalculator.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="BPCalculator.Tests.Features.BloodPressureCategoryClassificationFeature" name="HighBloodPressure" />
     </UnitTest>
     <UnitTest name="Low blood pressure" storage="/home/runner/work/bp/bp/bpcalculator.tests/bin/release/net9.0/bpcalculator.tests.dll" id="92b1d2e5-1a26-0fe2-2974-c2b6803af135">
-      <Execution id="62dce97e-578b-49af-a04e-dfb31137ecc3" />
+      <Execution id="0cf41916-16de-4727-b066-a740de83a22c" />
       <TestMethod codeBase="/home/runner/work/bp/bp/BPCalculator.Tests/bin/Release/net9.0/BPCalculator.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="BPCalculator.Tests.Features.BloodPressureCategoryClassificationFeature" name="LowBloodPressure" />
     </UnitTest>
     <UnitTest name="BPCalculator.Tests.BloodPressureTests.Throws_When_Systolic_Below_Min" storage="/home/runner/work/bp/bp/bpcalculator.tests/bin/release/net9.0/bpcalculator.tests.dll" id="aa6fe99d-2d83-9358-3cfe-2424fd3408d1">
-      <Execution id="819254bb-8f59-46c7-b332-a71f8d03eba7" />
+      <Execution id="9324675c-d00d-458a-b8d5-394c13a7b389" />
       <TestMethod codeBase="/home/runner/work/bp/bp/BPCalculator.Tests/bin/Release/net9.0/BPCalculator.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="BPCalculator.Tests.BloodPressureTests" name="Throws_When_Systolic_Below_Min" />
     </UnitTest>
     <UnitTest name="Ideal blood pressure" storage="/home/runner/work/bp/bp/bpcalculator.tests/bin/release/net9.0/bpcalculator.tests.dll" id="ba31608e-56ff-846e-926b-91a08278eb80">
-      <Execution id="d12866c5-c2ce-44a3-9900-e6d91dcc6157" />
+      <Execution id="47161566-ca6f-40b1-9f0f-382eb539a09d" />
       <TestMethod codeBase="/home/runner/work/bp/bp/BPCalculator.Tests/bin/Release/net9.0/BPCalculator.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="BPCalculator.Tests.Features.BloodPressureCategoryClassificationFeature" name="IdealBloodPressure" />
     </UnitTest>
     <UnitTest name="BPCalculator.Tests.BloodPressureTests.Calculates_Correct_Category(sys: 130, dia: 85, expected: PreHigh)" storage="/home/runner/work/bp/bp/bpcalculator.tests/bin/release/net9.0/bpcalculator.tests.dll" id="96e0c744-cc4e-7062-638e-7182710e370f">
-      <Execution id="5eed5b96-4189-4ad6-ac66-1aa9507ebdea" />
+      <Execution id="a9739b46-a14f-428d-9c51-365447367313" />
       <TestMethod codeBase="/home/runner/work/bp/bp/BPCalculator.Tests/bin/Release/net9.0/BPCalculator.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner2/netcoreapp" className="BPCalculator.Tests.BloodPressureTests" name="Calculates_Correct_Category" />
     </UnitTest>
   </TestDefinitions>
   <TestEntries>
-    <TestEntry testId="1811c636-61a8-d39f-981e-b740a3f3f974" executionId="b92c7c58-ff64-48cc-a772-2893fd8d79af" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
-    <TestEntry testId="aa6fe99d-2d83-9358-3cfe-2424fd3408d1" executionId="819254bb-8f59-46c7-b332-a71f8d03eba7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
-    <TestEntry testId="96e0c744-cc4e-7062-638e-7182710e370f" executionId="5eed5b96-4189-4ad6-ac66-1aa9507ebdea" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
-    <TestEntry testId="57440803-4d0b-c38d-550d-a33258b52a43" executionId="8dddaaa3-3782-4108-8cd9-3a74301de87b" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
-    <TestEntry testId="43aeb687-ef0f-f19d-c1dc-d20631e014b9" executionId="87b026bf-3d19-4339-997a-bd21157f1718" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
-    <TestEntry testId="ba31608e-56ff-846e-926b-91a08278eb80" executionId="d12866c5-c2ce-44a3-9900-e6d91dcc6157" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
-    <TestEntry testId="c2eda864-101c-ae68-2f5e-4e1e7c5be3c9" executionId="417f8370-f6f1-4182-afc2-37ade5d18b5a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
-    <TestEntry testId="92b1d2e5-1a26-0fe2-2974-c2b6803af135" executionId="62dce97e-578b-49af-a04e-dfb31137ecc3" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
-    <TestEntry testId="e9dec6f9-cc93-6cf8-3762-8c1b3bc12d3a" executionId="e8ce43f6-48e5-4b15-9530-e8cd8554cfbf" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
-    <TestEntry testId="6d52c65f-ec94-923a-d5a7-07f035e64d28" executionId="fa34b86e-4a25-4aea-b33c-d9f5985b1893" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="ba31608e-56ff-846e-926b-91a08278eb80" executionId="47161566-ca6f-40b1-9f0f-382eb539a09d" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="43aeb687-ef0f-f19d-c1dc-d20631e014b9" executionId="2f15c5ae-69e6-45fd-882e-f57ee75f8779" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="92b1d2e5-1a26-0fe2-2974-c2b6803af135" executionId="0cf41916-16de-4727-b066-a740de83a22c" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="96e0c744-cc4e-7062-638e-7182710e370f" executionId="a9739b46-a14f-428d-9c51-365447367313" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="57440803-4d0b-c38d-550d-a33258b52a43" executionId="420ad953-e4b9-404c-b144-93411715ee6f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c2eda864-101c-ae68-2f5e-4e1e7c5be3c9" executionId="f2426812-f864-4351-8300-28eb32fb0b2a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="aa6fe99d-2d83-9358-3cfe-2424fd3408d1" executionId="9324675c-d00d-458a-b8d5-394c13a7b389" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="e9dec6f9-cc93-6cf8-3762-8c1b3bc12d3a" executionId="182888c4-332f-43de-834d-6e32f92ed0f6" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="1811c636-61a8-d39f-981e-b740a3f3f974" executionId="176933fe-11fc-4592-94f9-db75b03579c7" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="6d52c65f-ec94-923a-d5a7-07f035e64d28" executionId="6f3121a3-b5f9-4d73-8600-06b9453b1c3e" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
   </TestEntries>
   <TestLists>
     <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
@@ -122,13 +122,13 @@ Then the result should be "High Blood Pressure"
     <Counters total="10" executed="10" passed="10" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
     <Output>
       <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v2.8.2+699d445a1a (64-bit .NET 9.0.11)
-[xUnit.net 00:00:00.26]   Discovering: BPCalculator.Tests
-[xUnit.net 00:00:00.71]   Discovered:  BPCalculator.Tests
-[xUnit.net 00:00:00.72]   Starting:    BPCalculator.Tests
+[xUnit.net 00:00:00.18]   Discovering: BPCalculator.Tests
+[xUnit.net 00:00:00.45]   Discovered:  BPCalculator.Tests
+[xUnit.net 00:00:00.45]   Starting:    BPCalculator.Tests
 -&gt; Loading plugin /home/runner/work/bp/bp/BPCalculator.Tests/bin/Release/net9.0/TechTalk.SpecFlow.xUnit.SpecFlowPlugin.dll
 -&gt; Loading plugin /home/runner/work/bp/bp/BPCalculator.Tests/bin/Release/net9.0/BPCalculator.Tests.dll
 -&gt; Using default config
-[xUnit.net 00:00:01.25]   Finished:    BPCalculator.Tests
+[xUnit.net 00:00:00.85]   Finished:    BPCalculator.Tests
 </StdOut>
     </Output>
   </ResultSummary>
