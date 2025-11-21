@@ -1,7 +1,7 @@
-name: CI - Build & Test Only
+name: CI - Build, Test, Coverage, SonarCloud
 
 permissions:
-  contents: write   # required to push test reports into repo
+  contents: write
 
 on:
   pull_request:
@@ -10,83 +10,87 @@ on:
     branches: [ master ]
 
 jobs:
-  build-test:
+  build-test-sonar:
     runs-on: ubuntu-latest
 
     steps:
 
-      # -----------------------------
       # Checkout
-      # -----------------------------
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # -----------------------------
       # Setup .NET
-      # -----------------------------
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      # -----------------------------
-      # Restore Dependencies
-      # -----------------------------
+      # Install tools
+      - name: Install ReportGenerator
+        run: dotnet tool install --global dotnet-reportgenerator-globaltool
+
+      - name: Install SonarScanner
+        run: dotnet tool install --global dotnet-sonarscanner
+
+      - name: Add .NET tools to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      # Restore
       - name: Restore dependencies
         run: dotnet restore
 
-      # -----------------------------
-      # Build Solution
-      # -----------------------------
-      - name: Build solution
+      # Sonar Begin
+      - name: SonarCloud Begin
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          dotnet-sonarscanner begin \
+            /k:"${{ secrets.SONAR_PROJECT_KEY }}" \
+            /o:"${{ secrets.SONAR_ORG }}" \
+            /d:sonar.host.url="https://sonarcloud.io" \
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+
+      # Build
+      - name: Build
         run: dotnet build --configuration Release --no-restore
 
-      # -----------------------------
-      # Run Unit + BDD Tests (TRX)
-      # -----------------------------
-      - name: Run Unit & BDD Tests (TRX)
-        run: |
-          mkdir -p TestOutput/TestResults
-          dotnet test --no-build --configuration Release \
-            --logger "trx;LogFileName=test_results.trx" \
-            --results-directory "TestOutput/TestResults"
-
-      # -----------------------------
-      # Run Coverage
-      # -----------------------------
-      - name: Run Coverage
-        run: |
-          mkdir -p TestOutput/CoverageRaw
-          dotnet test --no-build --configuration Release \
-            --collect:"XPlat Code Coverage" \
-            --results-directory TestOutput/CoverageRaw
-
-      # -----------------------------
-      # Copy Coverage File
-      # -----------------------------
-      - name: Copy Coverage File
+      # Run Unit + BDD Tests
+      - name: Run Tests (TRX)
         run: |
           mkdir -p TestReports
-          cp TestOutput/CoverageRaw/**/coverage.cobertura.xml TestReports/coverage.cobertura.xml || true
+          dotnet test --no-build --configuration Release \
+            --logger "trx;LogFileName=test_results.trx" \
+            --results-directory TestReports
 
-      # -----------------------------
-      # Copy TRX File
-      # -----------------------------
-      - name: Copy TRX File
+      # Collect Coverage
+      - name: Collect Coverage
         run: |
-          cp TestOutput/TestResults/*.trx TestReports/test_results.trx || true
+          mkdir -p TestReports
+          dotnet test --no-build --configuration Release \
+            --collect:"XPlat Code Coverage" \
+            --results-directory coverage-temp
+          cp coverage-temp/**/coverage.cobertura.xml TestReports/coverage.cobertura.xml
 
-      # -----------------------------
-      # Commit + Push Results
-      # -----------------------------
-      - name: Commit and Push Test Reports
+      # Sonar End
+      - name: SonarCloud End
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
+
+      # Commit Test Results to repo
+      - name: Commit Test Reports to Repo
         run: |
-          git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
           git add TestReports/*
-
-          git commit -m "Add latest test & coverage reports [skip ci]" || echo "No changes to commit"
-
+          git commit -m "Add test + coverage reports [skip ci]" || echo "No changes"
           git push
+
+      # Upload artifacts
+      - name: Upload Test Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-and-coverage-reports
+          path: TestReports/
