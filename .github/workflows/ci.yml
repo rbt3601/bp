@@ -56,7 +56,7 @@ jobs:
             /o:"${SONAR_ORG}" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="${SONAR_TOKEN}" \
-            /d:sonar.cs.opencover.reportsPaths="TestReports/coverage.opencover.xml"
+            /d:sonar.cs.opencover.reportsPaths="./TestReports/coverage.opencover.xml"
 
       # ----------------------------------------
       # Build the solution
@@ -82,7 +82,7 @@ jobs:
           dotnet test --no-build --configuration Release \
             /p:CollectCoverage=true \
             /p:CoverletOutputFormat=opencover \
-            /p:CoverletOutput=TestReports/coverage.opencover.xml
+            /p:CoverletOutput="./TestReports/coverage.opencover.xml"
 
       # ----------------------------------------
       # SonarCloud End
@@ -93,7 +93,7 @@ jobs:
         run: dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
 
       # ----------------------------------------
-      # Upload Test Reports + Coverage as Artifacts
+      # Upload Test Reports + Coverage
       # ----------------------------------------
       - name: Upload Test Reports
         uses: actions/upload-artifact@v4
