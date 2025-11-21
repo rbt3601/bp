@@ -22,22 +22,19 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      # Install SonarCloud tool
       - name: Install dotnet-sonarscanner
         run: dotnet tool install --global dotnet-sonarscanner
 
       - name: Add dotnet tool PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      # Install coverage report generator
       - name: Install ReportGenerator
         run: dotnet tool install --global dotnet-reportgenerator-globaltool
 
-      # Restore Dependencies
       - name: Restore dependencies
         run: dotnet restore
 
-      # SonarCloud Begin
+      # ---- Sonar Begin ----
       - name: SonarCloud - Begin analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -49,13 +46,11 @@ jobs:
             /o:"$SONAR_ORG" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="$SONAR_TOKEN" \
-            /d:sonar.cs.opencover.reportsPaths="TestOutput/Coverage/OpenCover.xml"
+            /d:sonar.cs.cobertura.reportsPaths="TestOutput/Coverage/Cobertura.xml"
 
-      # Build
       - name: Build solution
         run: dotnet build --configuration Release --no-restore
 
-      # Run Tests (TRX)
       - name: Run Unit + BDD Tests (TRX)
         run: |
           mkdir -p TestOutput/TestResults
@@ -63,7 +58,6 @@ jobs:
             --logger "trx;LogFileName=test_results.trx" \
             --results-directory "TestOutput/TestResults"
 
-      # Run Tests with Coverage
       - name: Run Tests with Coverage
         run: |
           mkdir -p TestOutput/coverage-temp
@@ -71,28 +65,25 @@ jobs:
             --collect:"XPlat Code Coverage" \
             --results-directory "TestOutput/coverage-temp"
 
-      # Convert coverage to OpenCover
-      - name: Convert Coverage (Cobertura → OpenCover)
+      - name: Convert Coverage to Cobertura
         run: |
+          mkdir -p TestOutput/Coverage
           reportgenerator \
             -reports:TestOutput/coverage-temp/**/coverage.cobertura.xml \
             -targetdir:TestOutput/Coverage \
-            -reporttypes:OpenCover
+            -reporttypes:Cobertura
 
-      # SonarCloud End
       - name: SonarCloud - End analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
-      # Upload test results
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: TestOutput/TestResults/
 
-      # Upload coverage
       - name: Upload Coverage Output
         uses: actions/upload-artifact@v4
         with:
