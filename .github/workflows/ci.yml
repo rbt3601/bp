@@ -1,10 +1,8 @@
-name: CI - Build, Tests, Coverage, SonarCloud
+name: build-test-sonar
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    branches: [ "master" ]
 
 jobs:
   build-test-sonar:
@@ -12,7 +10,7 @@ jobs:
 
     steps:
       # ----------------------------------------
-      # Checkout code
+      # Checkout Code
       # ----------------------------------------
       - name: Checkout code
         uses: actions/checkout@v4
@@ -20,52 +18,47 @@ jobs:
           fetch-depth: 0
 
       # ----------------------------------------
-      # Setup .NET SDK
+      # Setup .NET
       # ----------------------------------------
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: 8.0.x
 
       # ----------------------------------------
-      # Install SonarCloud Scanner
+      # Install SonarScanner
       # ----------------------------------------
-      - name: Install dotnet-sonarscanner
-        run: dotnet tool install --global dotnet-sonarscanner
-
-      - name: Add dotnet tools to PATH
-        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+      - name: Install SonarScanner
+        run: |
+          dotnet tool install --global dotnet-sonarscanner
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
       # ----------------------------------------
       # Restore Dependencies
       # ----------------------------------------
-      - name: Restore dependencies
+      - name: Restore
         run: dotnet restore
 
       # ----------------------------------------
-      # SonarCloud Begin
+      # Begin SonarCloud Analysis
       # ----------------------------------------
       - name: SonarCloud Begin
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
-          SONAR_ORG: ${{ secrets.SONAR_ORG }}
         run: |
           dotnet-sonarscanner begin \
-            /k:"${SONAR_PROJECT_KEY}" \
-            /o:"${SONAR_ORG}" \
+            /k:"${{ secrets.SONAR_PROJECT_KEY }}" \
+            /o:"${{ secrets.SONAR_ORG }}" \
             /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.token="${SONAR_TOKEN}" \
-            /d:sonar.cs.opencover.reportsPaths="TestReports/coverage.opencover.xml"
+            /d:sonar.token="${{ secrets.SONAR_TOKEN }}" \
+            /d:sonar.cs.opencover.reportsPaths="TestReports/coverage.cobertura.xml"
 
       # ----------------------------------------
-      # Build the solution
+      # Build (No Restore)
       # ----------------------------------------
-      - name: Build solution
+      - name: Build
         run: dotnet build --configuration Release --no-restore
 
       # ----------------------------------------
-      # Run Unit + BDD Tests (TRX)
+      # Run Unit + BDD Tests (Generate TRX)
       # ----------------------------------------
       - name: Run Unit + BDD Tests
         run: |
@@ -75,38 +68,35 @@ jobs:
             --results-directory "TestReports"
 
       # ----------------------------------------
-      # Run Tests WITH Coverage (OpenCover)
+      # Run Tests WITH Coverage (Collector)
       # ----------------------------------------
-      - name: Run Tests With Coverage (OpenCover)
+      - name: Run Tests With Coverage
         run: |
           mkdir -p TestReports
           dotnet test --no-build --configuration Release \
-            /p:CollectCoverage=true \
-            /p:CoverletOutput=TestReports/coverage_ \
-            /p:CoverletOutputFormat="opencover"
-
+            --collect:"XPlat Code Coverage" \
+            --results-directory "TestReports"
 
       # ----------------------------------------
-      # Debug: Verify TestReports folder
+      # Move Cobertura file to expected name
       # ----------------------------------------
-      - name: Verify TestReports Directory
+      - name: Move Coverage File
         run: |
-          echo "Listing TestReports directory..."
+          mv TestReports/*/coverage.cobertura.xml TestReports/coverage.cobertura.xml || true
           ls -R TestReports
 
       # ----------------------------------------
-      # SonarCloud End
+      # End SonarCloud Analysis
       # ----------------------------------------
       - name: SonarCloud End
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
+        run: dotnet-sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
 
       # ----------------------------------------
-      # Upload Test Reports + Coverage as Artifacts
+      # Upload Test Report Artifacts
       # ----------------------------------------
-      - name: Upload Test Reports
+      - name: Upload TestReports
         uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: TestReports/
+          if-no-files-found: warn
