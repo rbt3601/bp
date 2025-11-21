@@ -1,9 +1,9 @@
 name: CI - Build, Tests, Coverage, SonarCloud
 
 on:
-  pull_request:
-    branches: [ master ]
   push:
+    branches: [ master ]
+  pull_request:
     branches: [ master ]
 
 jobs:
@@ -11,30 +11,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
+      # --- Get source code ---
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # --- .NET SDK ---
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
+      # --- Sonar scanner global tool ---
       - name: Install dotnet-sonarscanner
         run: dotnet tool install --global dotnet-sonarscanner
 
-      - name: Add dotnet tool PATH
+      - name: Add dotnet tools to PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      - name: Install ReportGenerator
-        run: dotnet tool install --global dotnet-reportgenerator-globaltool
-
+      # --- Restore packages ---
       - name: Restore dependencies
         run: dotnet restore
 
-      # ---- Sonar Begin ----
+      # --- SonarCloud: begin analysis ---
       - name: SonarCloud - Begin analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -46,46 +46,44 @@ jobs:
             /o:"$SONAR_ORG" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="$SONAR_TOKEN" \
-            /d:sonar.cs.cobertura.reportsPaths="TestOutput/Coverage/Cobertura.xml"
+            /d:sonar.cs.cobertura.reportsPaths="TestOutput/coverage/coverage.cobertura.xml"
 
+      # --- Build ---
       - name: Build solution
         run: dotnet build --configuration Release --no-restore
 
-      - name: Run Unit + BDD Tests (TRX)
+      # --- Tests (unit + BDD) + coverage in ONE run ---
+      - name: Run Unit + BDD Tests with coverage
         run: |
           mkdir -p TestOutput/TestResults
+          mkdir -p TestOutput/coverage
           dotnet test --no-build --configuration Release \
             --logger "trx;LogFileName=test_results.trx" \
-            --results-directory "TestOutput/TestResults"
+            --results-directory "TestOutput/TestResults" \
+            /p:CollectCoverage=true \
+            /p:CoverletOutput=TestOutput/coverage/ \
+            /p:CoverletOutputFormat=cobertura
 
-      - name: Run Tests with Coverage
-        run: |
-          mkdir -p TestOutput/coverage-temp
-          dotnet test --no-build --configuration Release \
-            --collect:"XPlat Code Coverage" \
-            --results-directory "TestOutput/coverage-temp"
+      # --- Security: vulnerable dependencies ---
+      - name: Security - Check vulnerable dependencies
+        run: dotnet list package --vulnerable --include-transitive
 
-      - name: Convert Coverage to Cobertura
-        run: |
-          mkdir -p TestOutput/Coverage
-          reportgenerator \
-            -reports:TestOutput/coverage-temp/**/coverage.cobertura.xml \
-            -targetdir:TestOutput/Coverage \
-            -reporttypes:Cobertura
-
+      # --- SonarCloud: end analysis (uploads report) ---
       - name: SonarCloud - End analysis
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet-sonarscanner end /d:sonar.token="$SONAR_TOKEN"
 
+      # --- Artifacts: TRX test report ---
       - name: Upload Test Results
         uses: actions/upload-artifact@v4
         with:
           name: test-results
           path: TestOutput/TestResults/
 
-      - name: Upload Coverage Output
+      # --- Artifacts: coverage report (Cobertura) ---
+      - name: Upload Coverage Report
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
-          path: TestOutput/Coverage/
+          path: TestOutput/coverage/
