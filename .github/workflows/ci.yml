@@ -11,40 +11,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ------------------------------------------------------
-      # Checkout
-      # ------------------------------------------------------
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      # ------------------------------------------------------
-      # Setup .NET
-      # ------------------------------------------------------
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      # ------------------------------------------------------
-      # Install Sonar Scanner
-      # ------------------------------------------------------
-      - name: Install dotnet-sonarscanner
+      - name: Install Sonar Scanner
         run: dotnet tool install --global dotnet-sonarscanner
 
-      - name: Add dotnet-tools to PATH
+      - name: Add dotnet tools to PATH
         run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      # ------------------------------------------------------
-      # Restore
-      # ------------------------------------------------------
       - name: Restore dependencies
         run: dotnet restore
 
-      # ------------------------------------------------------
-      # SonarCloud Begin
-      # ------------------------------------------------------
       - name: SonarCloud Begin
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -56,17 +41,11 @@ jobs:
             /o:"${SONAR_ORG}" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="${SONAR_TOKEN}" \
-            /d:sonar.cs.opencover.reportsPaths="TestReports/coverage.opencover.xml"
+            /d:sonar.cs.opencover.reportsPaths="TestReports/coverage.cobertura.xml"
 
-      # ------------------------------------------------------
-      # Build
-      # ------------------------------------------------------
-      - name: Build solution
+      - name: Build
         run: dotnet build --configuration Release --no-restore
 
-      # ------------------------------------------------------
-      # Unit + BDD Tests (TRX)
-      # ------------------------------------------------------
       - name: Run Unit + BDD Tests (TRX)
         run: |
           mkdir -p TestReports
@@ -74,38 +53,25 @@ jobs:
             --logger "trx;LogFileName=test_results.trx" \
             --results-directory "TestReports"
 
-      # ------------------------------------------------------
-      # Coverage (OpenCover) → REQUIRED FOR SONAR
-      # ------------------------------------------------------
-      - name: Run Tests With Coverage (OpenCover)
+      - name: Run Tests WITH Coverage (Cobertura)
         run: |
           mkdir -p TestReports
           dotnet test --no-build --configuration Release \
-            /p:CollectCoverage=true \
-            /p:CoverletOutput=TestReports/coverage.opencover.xml \
-            /p:CoverletOutputFormat=\"opencover\" \
-            /p:Exclude="[xunit.*]*"
+            --collect:"XPlat Code Coverage" \
+            --results-directory "TestReports"
 
+      - name: Move Coverage File
+        run: |
+          mv TestReports/**/coverage.cobertura.xml TestReports/coverage.cobertura.xml || true
+          ls -R TestReports
 
-      # ------------------------------------------------------
-      # DEBUG CHECK — SHOW GENERATED REPORTS
-      # ------------------------------------------------------
-      - name: List TestReports Content
-        run: ls -R TestReports
-
-      # ------------------------------------------------------
-      # SonarCloud End
-      # ------------------------------------------------------
       - name: SonarCloud End
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
 
-      # ------------------------------------------------------
-      # Upload Artifacts
-      # ------------------------------------------------------
       - name: Upload Test Reports
         uses: actions/upload-artifact@v4
         with:
-          name: TestReports
+          name: test-results
           path: TestReports/
