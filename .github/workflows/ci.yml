@@ -11,25 +11,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # -------------------------------
+      # Checkout
+      # -------------------------------
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
+      # -------------------------------
+      # Setup .NET 8
+      # -------------------------------
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
 
-      - name: Install Tools
-        run: |
-          dotnet tool install --global dotnet-sonarscanner
-          dotnet tool install --global dotnet-reportgenerator-globaltool
-          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+      # -------------------------------
+      # Install Sonar Scanner
+      # -------------------------------
+      - name: Install Sonar Scanner
+        run: dotnet tool install --global dotnet-sonarscanner
 
-      - name: Restore
+      - name: Add dotnet tools to PATH
+        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      # -------------------------------
+      # Restore dependencies
+      # -------------------------------
+      - name: Restore dependencies
         run: dotnet restore
 
+      # -------------------------------
+      # SonarCloud Begin
+      # -------------------------------
       - name: SonarCloud Begin
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -41,11 +56,17 @@ jobs:
             /o:"${SONAR_ORG}" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="${SONAR_TOKEN}" \
-            /d:sonar.coverageReportPaths="TestReports/Cobertura.xml"
+            /d:sonar.cs.opencover.reportsPaths="TestReports/coverage.opencover.xml"
 
+      # -------------------------------
+      # Build
+      # -------------------------------
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
+      # -------------------------------
+      # Run Unit + BDD Tests (TRX)
+      # -------------------------------
       - name: Run Unit + BDD Tests (TRX)
         run: |
           mkdir -p TestReports
@@ -53,29 +74,35 @@ jobs:
             --logger "trx;LogFileName=test_results.trx" \
             --results-directory "TestReports"
 
-      - name: Run Tests WITH Raw Coverage (XPlat)
+      # -------------------------------
+      # Run Tests WITH OpenCover Coverage
+      # -------------------------------
+      - name: Run Tests + Coverage (OpenCover)
         run: |
-          mkdir -p TestReports/Coverage
-          dotnet test --configuration Release \
-            --collect:"XPlat Code Coverage" \
-            --results-directory "TestReports/Coverage"
+          mkdir -p TestReports
+          dotnet test --no-build --configuration Release \
+            /p:CollectCoverage=true \
+            /p:CoverletOutputFormat=opencover \
+            /p:CoverletOutput=TestReports/coverage.opencover.xml
 
-      - name: Convert Coverage -> Cobertura
-        run: |
-          reportgenerator \
-            -reports:TestReports/Coverage/**/coverage.cobertura.xml \
-            -targetdir:TestReports \
-            -reporttypes:Cobertura
+      # -------------------------------
+      # List TestReports folder (debug)
+      # -------------------------------
+      - name: List TestReports folder
+        run: ls -R TestReports
 
-          ls -R TestReports
-
+      # -------------------------------
+      # SonarCloud End
+      # -------------------------------
       - name: SonarCloud End
-        continue-on-error: true
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
 
-      - name: Upload Artifacts
+      # -------------------------------
+      # Upload Artifact
+      # -------------------------------
+      - name: Upload Test Reports
         uses: actions/upload-artifact@v4
         with:
           name: test-results
