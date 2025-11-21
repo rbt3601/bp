@@ -82,9 +82,9 @@ jobs:
           mkdir -p TestReports
           dotnet test --no-build --configuration Release \
             /p:CollectCoverage=true \
-            /p:CoverletOutputFormat=opencover \
-            /p:CoverletOutput=TestReports/coverage.opencover.xml \
-            /p:MergeWith=""
+            /p:CoverletOutput=TestReports/coverage_ \
+            /p:CoverletOutputFormat="opencover"
+
 
       # ----------------------------------------
       # Debug: Verify TestReports folder
