@@ -21,13 +21,13 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
-      - name: Install Sonar Scanner
-        run: dotnet tool install --global dotnet-sonarscanner
+      - name: Install Tools
+        run: |
+          dotnet tool install --global dotnet-sonarscanner
+          dotnet tool install --global dotnet-reportgenerator-globaltool
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      - name: Add dotnet tools to PATH
-        run: echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-
-      - name: Restore dependencies
+      - name: Restore
         run: dotnet restore
 
       - name: SonarCloud Begin
@@ -41,7 +41,7 @@ jobs:
             /o:"${SONAR_ORG}" \
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="${SONAR_TOKEN}" \
-            /d:sonar.coverageReportPaths="TestReports/coverage.cobertura.xml"
+            /d:sonar.coverageReportPaths="TestReports/Cobertura.xml"
 
       - name: Build
         run: dotnet build --configuration Release --no-restore
@@ -53,20 +53,28 @@ jobs:
             --logger "trx;LogFileName=test_results.trx" \
             --results-directory "TestReports"
 
-      - name: Run Tests WITH Coverage (Cobertura)
+      - name: Run Tests WITH Raw Coverage (XPlat)
         run: |
-          mkdir -p TestReports
-          dotnet test --no-build --configuration Release \
-            /p:CollectCoverage=true \
-            /p:CoverletOutputFormat=cobertura \
-            /p:CoverletOutput=TestReports/coverage.cobertura.xml
+          mkdir -p TestReports/Coverage
+          dotnet test --configuration Release \
+            --collect:"XPlat Code Coverage" \
+            --results-directory "TestReports/Coverage"
+
+      - name: Convert Coverage -> Cobertura
+        run: |
+          reportgenerator \
+            -reports:TestReports/Coverage/**/coverage.cobertura.xml \
+            -targetdir:TestReports \
+            -reporttypes:Cobertura
+
+          ls -R TestReports
 
       - name: SonarCloud End
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
 
-      - name: Upload Test Reports
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
           name: test-results
