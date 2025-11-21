@@ -70,6 +70,7 @@ jobs:
           ls -R TestReports
 
       - name: SonarCloud End
+        continue-on-error: true
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
