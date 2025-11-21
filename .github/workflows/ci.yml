@@ -82,8 +82,10 @@ jobs:
           mkdir -p TestReports
           dotnet test --no-build --configuration Release \
             /p:CollectCoverage=true \
-            /p:CoverletOutput=TestReports/coverage_ \
-            /p:CoverletOutputFormat="opencover"
+            /p:CoverletOutput=TestReports/coverage.opencover.xml \
+            /p:CoverletOutputFormat=\"opencover\" \
+            /p:Exclude="[xunit.*]*"
+
 
       # ------------------------------------------------------
       # DEBUG CHECK — SHOW GENERATED REPORTS
