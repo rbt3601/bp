@@ -15,11 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-
-      - name: Dependency Vulnerability Review
-        if: github.event_name == 'pull_request'
-        uses: actions/dependency-review-action@v3      
+          fetch-depth: 0   
       
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -47,6 +43,18 @@ jobs:
             /d:sonar.host.url="https://sonarcloud.io" \
             /d:sonar.token="${SONAR_TOKEN}" \
             /d:sonar.cs.opencover.reportsPaths="TestReports/coverage.opencover.xml"
+      - name: Install Trivy
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install wget apt-transport-https gnupg lsb-release -y
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update -y
+          sudo apt-get install trivy -y
+
+
+      - name: Run Trivy Vulnerability Scan
+        run: trivy fs --severity HIGH,CRITICAL --exit-code 1 --no-progress .
 
       - name: Build
         run: dotnet build --configuration Release --no-restore
