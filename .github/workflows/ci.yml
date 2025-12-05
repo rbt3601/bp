@@ -2,9 +2,14 @@ name: CI - Build, Tests, Coverage, SonarCloud
 # Run pipeline on every push or pull request to master
 on:
   push:
-    branches: [ master ]
+    branches: 
+      - master
+      - qa
+      - acceptance-bdd
   pull_request:
-    branches: [ master ]
+    branches:
+      - master
+      
 jobs:
   build-test-sonar:
     runs-on: ubuntu-latest
@@ -61,7 +66,7 @@ jobs:
       # Publish the application 
       - name: Publish App
         run: dotnet publish --configuration Release --output ./published-app
-        
+
       # Run all Unit + BDD tests and save results
       - name: Run Unit + BDD Tests
         run: |

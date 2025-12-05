@@ -1,23 +1,37 @@
 name: CD - Deploy to QA Environment
 
 on:
-  workflow_dispatch:        # Manual trigger
-  push:
-    branches: [ master ]    # Optional auto-deploy to QA
+  workflow_run:
+    workflows: ["CI - Build, Tests, Coverage, SonarCloud"]
+    types:
+      - completed
 
 jobs:
   deploy-to-qa:
     runs-on: ubuntu-latest
 
+    # Run only when:
+    # 1. CI succeeded
+    # 2. CI was triggered by a push event
+    # 3. That push was to the QA branch
+    if: |
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' &&
+          github.event.workflow_run.head_branch == 'qa' }}
+
+    environment:
+      name: qa
+      url: https://bp-calculator-qa.azurewebsites.net
+
     steps:
-      # Step 1: Download the published artifact from CI
+      # Step 1: Download CI artifact
       - name: Download Published Artifact
         uses: actions/download-artifact@v4
         with:
           name: published-app
           path: ./publish
 
-      # Step 2: Deploy to Azure App Service (QA)
+      # Step 2: Deploy to Azure App Service
       - name: Deploy to Azure Web App (QA)
         uses: azure/webapps-deploy@v3
         with:
@@ -25,19 +39,13 @@ jobs:
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}
           package: ./publish
 
-      # Step 3: Basic End-to-End test
-      - name: Run E2E Test on QA
+      # Step 3: Basic E2E check
+      - name: Run QA Smoke Test
         run: |
           echo "Checking if the app is running..."
           curl -I https://bp-calculator-qa.azurewebsites.net
 
-      # Step 4: Basic Performance Test
-      - name: Run Performance Test
-        run: |
-          echo "Running quick performance test..."
-          for i in {1..10}; do curl -s https://bp-calculator-qa.azurewebsites.net > /dev/null; done
-
-      # Step 5: Deployment verification
+      # Step 4: Verify deployment status
       - name: Verify Deployment Success
         run: |
           STATUS=$(curl -I -s https://bp-calculator-qa.azurewebsites.net | head -n 1)
