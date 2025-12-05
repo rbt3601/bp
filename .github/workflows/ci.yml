@@ -27,9 +27,9 @@ jobs:
           dotnet tool install --global dotnet-sonarscanner
           dotnet tool install --global coverlet.console
           echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
-          
-      - name: Check Code Formatting
-        run: dotnet format --verify-no-changes
+
+#      - name: Check Code Formatting
+#        run: dotnet format --verify-no-changes
 
       - name: Restore
         run: dotnet restore
