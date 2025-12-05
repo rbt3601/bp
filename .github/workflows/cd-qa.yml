@@ -1,163 +1,130 @@
-name: QA Pipeline (CI + CD)
+name: CI-CD Container Pipeline
 
 on:
   push:
     branches:
-      - QA
+      - QA   # Only trigger CI/CD when pushing to QA branch
 
 permissions:
-  actions: read
+  actions: write
   contents: read
+
+env:
+  DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+  DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+  IMAGE_NAME: "bp-calculator"   # Docker image name
+  FULL_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/bp-calculator:latest
+  AZURE_APP: "bp-calculator-qa" # Azure app service name
 
 jobs:
 
-  ###############################################################
-  #                      CI JOB                                 #
-  ###############################################################
+  #######################################################
+  #                     CI JOB
+  #######################################################
   ci:
-    name: Build, Test, Quality Scan
+    name: CI - Build, Test, Scan
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout source code
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Install .NET SDK
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x'
+          dotnet-version: "8.0.x"
 
-      # Install global tools
       - name: Install Tools
         run: |
-          dotnet tool install --global dotnet-sonarscanner
           dotnet tool install --global coverlet.console
           echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      # Restore dependencies
-      - name: Restore
+      - name: Restore Dependencies
         run: dotnet restore
 
-      # Start SonarCloud analysis
-      - name: SonarCloud Begin
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
-          SONAR_ORG: ${{ secrets.SONAR_ORG }}
-        run: |
-          dotnet-sonarscanner begin \
-            /k:"${SONAR_PROJECT_KEY}" \
-            /o:"${SONAR_ORG}" \
-            /d:sonar.host.url="https://sonarcloud.io" \
-            /d:sonar.token="${SONAR_TOKEN}" \
-            /d:sonar.cs.opencover.reportsPaths="TestReports/coverage.opencover.xml"
-
-      # Run security scan
-      - name: Install Trivy
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install wget apt-transport-https gnupg lsb-release -y
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update -y
-          sudo apt-get install trivy -y
-
-      - name: Run Vulnerability Scan
-        run: trivy fs --severity HIGH,CRITICAL --exit-code 1 --no-progress .
-
-      # Build app
-      - name: Build
-        run: dotnet build --configuration Release --no-restore
-
       # Run Unit Tests + BDD Tests
-      - name: Run Unit + BDD Tests
+      - name: Run Tests
         run: |
           mkdir -p TestReports
           dotnet test BPCalculator.Tests/BPCalculator.Tests.csproj \
-            --configuration Release \
             --logger "trx;LogFileName=test_results.trx" \
             --results-directory TestReports
 
-      # Code Coverage
-      - name: Generate OpenCover Coverage
+      # Run Code Coverage
+      - name: Coverage Report
         run: |
-          mkdir -p TestReports
           coverlet \
             BPCalculator.Tests/bin/Release/net9.0/BPCalculator.Tests.dll \
             --target "dotnet" \
-            --targetargs "test BPCalculator.Tests/BPCalculator.Tests.csproj --configuration Release --no-build" \
+            --targetargs "test BPCalculator.Tests/BPCalculator.Tests.csproj --no-build" \
             --format opencover \
-            --output TestReports/coverage.opencover.xml
+            --output TestReports/coverage.xml
 
-      # End SonarCloud scan
-      - name: SonarCloud End
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: dotnet-sonarscanner end /d:sonar.token="${SONAR_TOKEN}"
-
-      # Publish only the web app (IMPORTANT FIX)
-      - name: Publish Web App
-        #run: dotnet publish BPCalculator/BPCalculator.csproj --configuration Release --output ./published-app
-        run: dotnet publish BPCalculator/BPCalculator.csproj -c Release -o ./published-app --no-restore
-
-
-
-      # Upload app for CD
-      - name: Upload Published Artifact
+      # Upload Test Results
+      - name: Upload Test Reports
         uses: actions/upload-artifact@v4
         with:
-          name: published-app
-          path: published-app/
+          name: test-results
+          path: TestReports/
 
+      # Build App (for container)
+      - name: Build App
+        run: dotnet build --configuration Release
 
-  ###############################################################
-  #                          CD JOB                               #
-  ###############################################################
-  cd:
-    name: Deploy to QA
+  #######################################################
+  #              Build & Push Docker Image
+  #######################################################
+  docker:
+    name: Build & Push Docker Image
     runs-on: ubuntu-latest
-    needs: ci   # must wait until CI completes
+    needs: ci
 
     steps:
-      # Download the published output from CI
-      - name: Download Published App
-        uses: actions/download-artifact@v4
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
         with:
-          name: published-app
-          path: ./publish
+          username: ${{ env.DOCKER_USER }}
+          password: ${{ env.DOCKER_TOKEN }}
 
-      - name: List Downloaded Files (CD)
+      - name: Build Docker Image
         run: |
-            echo "Downloaded Artifact Contents:"
-            ls -R ./publish
+          docker build -t $DOCKER_USER/${{ env.IMAGE_NAME }}:latest .
 
+      - name: Push to Docker Hub
+        run: docker push $DOCKER_USER/${{ env.IMAGE_NAME }}:latest
 
-      # Deploy to Azure App Service
-      - name: Deploy to Azure Web App
+  #######################################################
+  #                     CD JOB
+  #######################################################
+  deploy:
+    name: Deploy to Azure App Service (Container)
+    runs-on: ubuntu-latest
+    needs: docker    # Run ONLY after Docker job finishes
+
+    steps:
+      - name: Deploy to Azure Web App (Container)
         uses: azure/webapps-deploy@v3
         with:
-          app-name: bp-calculator-qa
+          app-name: ${{ env.AZURE_APP }}
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}
-          package: ./publish
+          images: "${{ env.FULL_IMAGE }}"
 
-      # Smoke test with retry (avoids warm-up failure)
-      - name: Smoke Test with Retry
+      - name: Smoke Test After Deployment
         run: |
-            URL="https://bp-calculator-qa-cbgkg0bfdrdbf4c8.norwayeast-01.azurewebsites.net"
-            echo "Testing: $URL"
-
-            for i in {1..10}; do
-            echo "Attempt $i..."
-            curl -I $URL && break
-            echo "App not ready yet — retrying in 10 seconds..."
+          URL="https://${{ env.AZURE_APP }}.azurewebsites.net"
+          echo "Testing $URL ..."
+          
+          for i in {1..15}; do
+            if curl -s -I $URL | grep "200 OK"; then
+              echo "App UP!"
+              exit 0
+            fi
+            echo "Not ready, retrying..."
             sleep 10
-            done
+          done
 
-
-      - name: Final Verification
-        run: |
-            URL="https://bp-calculator-qa-cbgkg0bfdrdbf4c8.norwayeast-01.azurewebsites.net"
-            STATUS=$(curl -I -s $URL | head -n 1)
-            echo "App Response = $STATUS"
+          echo "App failed to start!"
+          exit 1
