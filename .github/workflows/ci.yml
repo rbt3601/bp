@@ -4,12 +4,12 @@ on:
   push:
     branches: 
       - master
-      - qa
+      - QA
       - acceptance-bdd
   pull_request:
     branches:
       - master
-      
+
 jobs:
   build-test-sonar:
     runs-on: ubuntu-latest
