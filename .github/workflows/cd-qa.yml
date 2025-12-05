@@ -15,7 +15,7 @@ permissions:
 
 env:
   DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
-  DOCKER_TOKEN: ${{ secrets.DOCKERHUB_PASSWORD }}
+  DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
   IMAGE_NAME: bp-calculator
   FULL_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/bp-calculator:latest
   AZURE_WEBAPP_NAME: bp-calculator-qa
