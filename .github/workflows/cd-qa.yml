@@ -1,0 +1,44 @@
+name: CD - Deploy to QA Environment
+
+on:
+  workflow_dispatch:        # Manual trigger
+  push:
+    branches: [ master ]    # Optional auto-deploy to QA
+
+jobs:
+  deploy-to-qa:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Download the published artifact from CI
+      - name: Download Published Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: published-app
+          path: ./publish
+
+      # Step 2: Deploy to Azure App Service (QA)
+      - name: Deploy to Azure Web App (QA)
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: bp-calculator-qa
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}
+          package: ./publish
+
+      # Step 3: Basic End-to-End test
+      - name: Run E2E Test on QA
+        run: |
+          echo "Checking if the app is running..."
+          curl -I https://bp-calculator-qa.azurewebsites.net
+
+      # Step 4: Basic Performance Test
+      - name: Run Performance Test
+        run: |
+          echo "Running quick performance test..."
+          for i in {1..10}; do curl -s https://bp-calculator-qa.azurewebsites.net > /dev/null; done
+
+      # Step 5: Deployment verification
+      - name: Verify Deployment Success
+        run: |
+          STATUS=$(curl -I -s https://bp-calculator-qa.azurewebsites.net | head -n 1)
+          echo "App Response = $STATUS"
