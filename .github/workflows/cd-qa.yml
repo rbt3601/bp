@@ -99,9 +99,8 @@ jobs:
 
       # Publish only the web app (IMPORTANT FIX)
       - name: Publish Web App
-        run: dotnet publish BPCalculator/BPCalculator.csproj \
-              --configuration Release \
-              --output ./published-app
+        run: dotnet publish BPCalculator/BPCalculator.csproj --configuration Release --output ./published-app
+
 
       # Upload app for CD
       - name: Upload Published Artifact
