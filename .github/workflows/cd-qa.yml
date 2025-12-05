@@ -15,7 +15,7 @@ permissions:
 
 env:
   DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
-  DOCKER_TOKEN: ${{ secrets.DOCKERHUB_PASSWORD }}
+  DOCKER_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
   IMAGE_NAME: bp-calculator
   FULL_IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/bp-calculator:latest
   AZURE_WEBAPP_NAME: bp-calculator-qa
@@ -77,8 +77,8 @@ jobs:
       - name: Build
         run: dotnet build --configuration Release --no-restore
 
-      - name: Publish App
-        run: dotnet publish --configuration Release --output ./published-app
+      - name: Publish Web App
+        run: dotnet publish BPCalculator/BPCalculator.csproj --configuration Release --output ./published-app
 
       - name: Run Unit + BDD Tests
         run: |
