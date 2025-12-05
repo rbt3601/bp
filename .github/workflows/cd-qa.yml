@@ -6,6 +6,10 @@ on:
     types:
       - completed
 
+permissions:
+  actions: read
+  contents: read
+
 jobs:
   deploy-to-qa:
     runs-on: ubuntu-latest
@@ -15,12 +19,12 @@ jobs:
     # 2. CI was triggered by a push event
     # 3. That push was to the QA branch
     if: |
-      ${{ github.event.workflow_run.conclusion == 'success' &&
-          github.event.workflow_run.event == 'push' &&
-          github.event.workflow_run.head_branch == 'QA' }}
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push' &&
+      endsWith(github.event.workflow_run.head_branch, 'QA')
 
     environment:
-      name: qa
+      name: QA
       url: https://bp-calculator-qa.azurewebsites.net
 
     steps:
