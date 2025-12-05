@@ -126,13 +126,19 @@ jobs:
           name: published-app
           path: ./publish
 
+      - name: List Downloaded Files (CD)
+        run: |
+            echo "Downloaded Artifact Contents:"
+            ls -R ./publish
+
+
       # Deploy to Azure App Service
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: bp-calculator-qa
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}
-          package: ./publish/published-app
+          package: ./publish
 
       # Smoke test with retry (avoids warm-up failure)
       - name: Smoke Test with Retry
