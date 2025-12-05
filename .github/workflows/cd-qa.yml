@@ -17,25 +17,26 @@ jobs:
     # Run only when:
     # 1. CI succeeded
     # 2. CI was triggered by a push event
-    # 3. That push was to the QA branch
+    # 3. The push happened on branch QA
     if: |
       github.event.workflow_run.conclusion == 'success' &&
       github.event.workflow_run.event == 'push' &&
       endsWith(github.event.workflow_run.head_branch, 'QA')
-
+      
     environment:
-      name: QA
+      name: qa
       url: https://bp-calculator-qa.azurewebsites.net
 
     steps:
-      # Step 1: Download CI artifact
+      # Step 1: Download artifact from CI run
       - name: Download Published Artifact
         uses: actions/download-artifact@v4
         with:
           name: published-app
           path: ./publish
+          run-id: ${{ github.event.workflow_run.id }}
 
-      # Step 2: Deploy to Azure App Service
+      # Step 2: Deploy to Azure App Service (QA)
       - name: Deploy to Azure Web App (QA)
         uses: azure/webapps-deploy@v3
         with:
@@ -43,13 +44,11 @@ jobs:
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE_QA }}
           package: ./publish
 
-      # Step 3: Basic E2E check
+      # Step 3: QA smoke test
       - name: Run QA Smoke Test
-        run: |
-          echo "Checking if the app is running..."
-          curl -I https://bp-calculator-qa.azurewebsites.net
+        run: curl -I https://bp-calculator-qa.azurewebsites.net
 
-      # Step 4: Verify deployment status
+      # Step 4: Verify deployment
       - name: Verify Deployment Success
         run: |
           STATUS=$(curl -I -s https://bp-calculator-qa.azurewebsites.net | head -n 1)
